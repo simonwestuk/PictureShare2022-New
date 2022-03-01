@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PictureShare_.Data;
+using PictureShare_.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddAuthentication()
         microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
     });
 
+builder.Services.AddScoped<Images>();
 
 
 var app = builder.Build();
