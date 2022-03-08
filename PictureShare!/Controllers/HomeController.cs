@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PictureShare_.Data;
 using PictureShare_.Models;
 using System.Diagnostics;
 
@@ -7,15 +9,19 @@ namespace PictureShare_.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ApplicationDbContext _db;
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
         {
             _logger = logger;
+
+            _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var pictures = await _db.Pictures.ToListAsync();
+
+            return View(pictures);
         }
 
         public IActionResult Privacy()

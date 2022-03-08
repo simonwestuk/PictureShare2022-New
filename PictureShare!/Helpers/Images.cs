@@ -8,7 +8,7 @@
             _env = env;
         }
 
-        public string Upload(IFormFile file, string path)
+        public async Task<string> Upload(IFormFile file, string path)
         {
             //gets the extension of an image file e.g. "PNG"
             string extension = Path.GetExtension(file.FileName);
@@ -17,7 +17,7 @@
             string root = _env.WebRootPath;
 
             //combines the root and then the path of the image e.g. "C:/..../wwwRoot/Images/"
-            string uploadPath = Path.Combine(root, extension);
+            string uploadPath = $"{root}{path}";
 
             //creates a new filename from a guid with the correct extension for the image, so that all images have unique names even if the same image.
             string newFilename = $"{Guid.NewGuid()}{extension}".ToLower();
@@ -31,9 +31,9 @@
             //creates a new file stream to create a new file
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                file.CopyToAsync(fileStream);
+                await file.CopyToAsync(fileStream);
             }
-            return filePath;
+            return $"{path}{newFilename}";
         }
 
 

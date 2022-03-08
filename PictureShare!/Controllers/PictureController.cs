@@ -12,15 +12,17 @@ namespace PictureShare_.Controllers
     {
         private readonly ApplicationDbContext _db;
         private Images _image;
-        public PictureController(ApplicationDbContext db, Images image)
+        private IWebHostEnvironment _env;
+        public PictureController(ApplicationDbContext db, Images image, IWebHostEnvironment env)
         {
             _db = db;
             _image = image;
+            _env = env;
         }
 
         public async Task<IActionResult> Index()
         {
-            var pictures = await _db.Pictures.ToListAsync();
+            var pictures = await _db.Pictures.Where(x => x.UserEmail == User.Identity.Name).ToListAsync();
             return View(pictures);
         }
 
@@ -30,11 +32,20 @@ namespace PictureShare_.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(PictureModel model)
+        public async Task<IActionResult> Create(PictureModel model)
         {
             model.TimeStamp = DateTime.Now;
             model.UserEmail = User.Identity.Name;
-            return View();
+                
+            var file = Request.Form.Files[0];
+
+            Images images = new Images(_env);
+            model.ImagePath = await images.Upload(file, "/Images/");
+
+            await _db.Pictures.AddAsync(model);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+            
         }
 
     }
