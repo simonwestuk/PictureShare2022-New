@@ -1,25 +1,25 @@
 ﻿@model IEnumerable<PictureModel>
 
-
-<h1>Picture Index</h1>
-
 @if (Model != null)
 {
-    <div class="row">
+        <div class="row">
         @foreach (var item in Model)
         {
-            <div class="card my-3 mx-3" style="width: 18rem;">
-                <img src="@item.ImagePath" class="card-img-top my-2" alt="@item.Caption">
-                <p class="my-1 lh-1">@item.UserEmail</p>
-                <p class="my-1 lh-1">@item.TimeStamp</p>
-                <hr />
-                <div class="card-body my-2">
-                   
-                    <h4 class="card-title fw-bold" style="color: black">@item.Caption</h4>
-                </div>
-            </div>
+                    <div class="card my-3 mx-3 shadow" style="width: 18rem;">
+                        <a class="ms-auto text-decoration-none" asp-controller="Picture" asp-action="Delete" asp-route-id="@item.Id">X</a>
+                        <img src="@item.ImagePath" class="card-img-top my-2" alt="@item.Caption">
+
+                        <hr />
+                        <div class="card-body p-1 text-center">
+                            <h4 class="card-title fw-bold caption">@item.Caption</h4>
+                             <p class="my-1 lh-1 small fst-italic">@item.UserEmail</p>
+                             <p class="my-1 lh-1 small fst-italic">@item.TimeStamp</p>
+                             <a class="btn btn-primary" asp-action="makePublic" asp-route-id="@item.Id">Make Public</a>
+                        </div>
+                    </div>
+        
         } 
-    </div>
+        </div>
 }
 
 

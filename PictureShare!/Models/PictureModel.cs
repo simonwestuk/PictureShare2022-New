@@ -17,5 +17,7 @@ namespace PictureShare_.Models
 
         public DateTime TimeStamp { get; set; }
 
+        public bool Public { get; set; }
+
     }
 }
