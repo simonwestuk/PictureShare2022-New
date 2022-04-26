@@ -69,7 +69,7 @@ namespace PictureShare_.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> makePublic(Guid id)
+        public async Task<IActionResult> makePublic(Guid? id)
         {
             if (id == null)
             {
@@ -83,7 +83,7 @@ namespace PictureShare_.Controllers
                 return NotFound();
             }
 
-            model.Public = true;
+            model.Public = !model.Public;
             _db.Pictures.Update(model);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
