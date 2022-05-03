@@ -24,5 +24,7 @@ namespace PictureShare_.Models
 
         [ForeignKey("CategoryId")]
         public CategoryModel Category { get; set; }
+
+        public List<CommentModel> Comments { get; set; } = new List<CommentModel>();
     }
 }

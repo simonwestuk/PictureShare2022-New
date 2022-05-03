@@ -23,8 +23,24 @@ namespace PictureShare_.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var pictures = await _db.Pictures.Where(x => x.UserEmail == User.Identity.Name).ToListAsync();
+            var pictures = await _db.Pictures.Where(x => x.UserEmail == User.Identity.Name).Include("Category").ToListAsync();
             return View(pictures);
+        }
+
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null)
+            {
+                return View(nameof(Index));
+            }
+
+            var picture = await _db.Pictures.Where(x => x.Id.ToString() == id).Include("Category").FirstOrDefaultAsync();
+           
+            if (picture == null)
+                return View(nameof(Index));
+
+            return View(picture);
+
         }
 
         [HttpGet]
@@ -44,17 +60,17 @@ namespace PictureShare_.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(PictureModel model)
+        public async Task<IActionResult> Create(PictureViewModel model)
         {
-            model.TimeStamp = DateTime.Now;
-            model.UserEmail = User.Identity.Name;
-            model.Public = false;
+            model.Picture.TimeStamp = DateTime.Now;
+            model.Picture.UserEmail = User.Identity.Name;
+            model.Picture.Public = false;
             var file = Request.Form.Files[0];
 
             Images images = new Images(_env);
-            model.ImagePath = await images.Upload(file, "/Images/");
+            model.Picture.ImagePath = await images.Upload(file, "/Images/");
 
-            await _db.Pictures.AddAsync(model);
+            await _db.Pictures.AddAsync(model.Picture);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
             

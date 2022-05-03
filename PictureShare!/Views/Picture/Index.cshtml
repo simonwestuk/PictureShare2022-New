@@ -12,12 +12,15 @@
                         <hr />
                         <div class="card-body p-1 text-center">
                             <h4 class="card-title fw-bold caption">@item.Caption</h4>
+                            <p class="my-1 lh-1 small fst-italic">@item.Category.Name</p>
                              <p class="my-1 lh-1 small fst-italic">@item.UserEmail</p>
                              <p class="my-1 lh-1 small fst-italic">@item.TimeStamp</p>
                              <a class="btn btn-primary" asp-action="makePublic" asp-route-id="@item.Id">@( item.Public ? "Make Private" : "Make Public" )</a>
-                        </div>
+                             <p class="my-1 lh-1 small fst-italic">@item.Comments.Count() comments</p>
+                             <a class="btn btn-secondary" asp-action="Details" asp-route-id="@item.Id">Add Comment</a>
+                         </div>
                     </div>
-        
+           
         } 
         </div>
 }
