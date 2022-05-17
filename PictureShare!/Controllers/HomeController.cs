@@ -21,6 +21,12 @@ namespace PictureShare_.Controllers
         {
             var pictures = await _db.Pictures.Where(p => p.Public).Include("Category").ToListAsync();
 
+            foreach (var picture in pictures)
+            {
+                picture.Comments = await _db.Comments.Where(x => x.PictureId == picture.Id).Include("User").ToListAsync();
+            }
+
+
             return View(pictures);
         }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PictureShare_.Models
 {
@@ -14,6 +15,9 @@ namespace PictureShare_.Models
 
         public DateTime Timestamp { get; set; }
 
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
         public IdentityUser  User { get; set; }
 
     }

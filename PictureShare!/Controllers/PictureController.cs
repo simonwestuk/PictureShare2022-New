@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +15,24 @@ namespace PictureShare_.Controllers
         private readonly ApplicationDbContext _db;
         private Images _image;
         private IWebHostEnvironment _env;
-        public PictureController(ApplicationDbContext db, Images image, IWebHostEnvironment env)
+        private readonly UserManager<IdentityUser> _user;
+        public PictureController(ApplicationDbContext db, Images image, IWebHostEnvironment env, UserManager<IdentityUser> user)
         {
             _db = db;
             _image = image;
             _env = env;
+            _user = user;
         }
 
         public async Task<IActionResult> Index()
         {
             var pictures = await _db.Pictures.Where(x => x.UserEmail == User.Identity.Name).Include("Category").ToListAsync();
+
+            foreach (var picture in pictures)
+            {
+                picture.Comments = await _db.Comments.Where(x => x.PictureId == picture.Id).Include("User").ToListAsync();
+            }
+
             return View(pictures);
         }
 
@@ -35,12 +44,30 @@ namespace PictureShare_.Controllers
             }
 
             var picture = await _db.Pictures.Where(x => x.Id.ToString() == id).Include("Category").FirstOrDefaultAsync();
-           
+            picture.Comments = await _db.Comments.Where(x => x.PictureId == picture.Id).Include("User").OrderByDescending(x => x.Timestamp).ToListAsync();
             if (picture == null)
                 return View(nameof(Index));
 
             return View(picture);
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(string comment, Guid id)
+        {
+            var pic =  await _db.Pictures.Where(x => x.Id == id).FirstOrDefaultAsync();
+            pic.Comments.Add(new CommentModel
+            {
+                Comment = comment,
+                PictureId = id,
+                Timestamp = DateTime.Now,
+                User = await _user.FindByEmailAsync(User.Identity.Name)
+            }); 
+
+            _db.Pictures.Update(pic);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = pic.Id });
         }
 
         [HttpGet]
